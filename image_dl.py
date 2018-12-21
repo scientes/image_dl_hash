@@ -1,10 +1,13 @@
+import argparse
+import json
+from multiprocessing import Manager
+from multiprocessing.pool import ThreadPool
+
 import PIL.Image as Image
 import imagehash
 import requests
-import argparse
-import json
-from multiprocessing.pool import ThreadPool
-from multiprocessing import Manager
+
+
 def get_image(url):
     try:
         response = requests.get(url, stream=True, timeout=10)
@@ -71,12 +74,13 @@ def worker(input):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Test")
+    parser.add_argument("job_id", help="json which to take the links from", type=str)
     parser.add_argument("link_list_json", help="json which to take the links from", type=str)
     args = parser.parse_args()
-    link_list = json.loads(args.link_list_json())
+    link_list = json.loads(args.link_list_json)
     m = Manager()
     lock = m.Lock()
-    amount_threads=5
+    amount_threads = 10
     if len(link_list)<amount_threads:
         pool=ThreadPool(amount_threads)
     else:
@@ -84,6 +88,6 @@ if __name__ == "__main__":
     for i in range(len(link_list)):
         link_list[i].append(lock)
     result_list=pool.map(worker,link_list)
-    a=open("output.json","w")
+    a = open(args.job_id, "w")
     json.dump(result_list,a)
     a.close()
