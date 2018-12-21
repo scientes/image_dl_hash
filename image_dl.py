@@ -88,6 +88,6 @@ if __name__ == "__main__":
     for i in range(len(link_list)):
         link_list[i].append(lock)
     result_list=pool.map(worker,link_list)
-    a = open(args.job_id, "w")
+    a = open(args.job_id + ".json", "w")
     json.dump(result_list,a)
     a.close()
