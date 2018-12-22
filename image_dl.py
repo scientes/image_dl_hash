@@ -76,7 +76,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("Test")
     parser.add_argument("job_id", help="json which to take the links from", type=str)
     parser.add_argument("data", help="json which to take the links from", type=str)
-    parser.add_argument("dir", help="", type=str)
+    parser.add_argument("dir", help="", type=str, default="")
     args = parser.parse_args()
     print(args.data)
     link_list = json.loads(args.data)
@@ -91,7 +91,7 @@ if __name__ == "__main__":
         pool=ThreadPool(len(link_list))
     for i in range(len(link_list)):
         link_list[i].append(lock)
-        link_list[i].append(args.image_dir)
+        link_list[i].append(args.dir)
     result_list=pool.map(worker,link_list)
     a = open(args.dir + args.job_id + ".json", "w")
     json.dump(result_list,a)
