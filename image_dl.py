@@ -34,7 +34,7 @@ def classify_image(url):
 
 
 def worker(input):
-    name,link,lock = input
+    name, link, lock, image_dir = input
     try:
         response, image = get_image(link)
         if response == 1:
@@ -49,21 +49,21 @@ def worker(input):
             if image.format == "JPEG" or ((image.format == "MPO" or image.format == None or image.format == "BMP") and (
                     image.mode == 'RGB' or image.mode == 'L')):
                 if image.format != "JPEG" or image.format != "MPO":
-                    image.save("images/" + str(name) + ".jpg", "JPEG", optimize=True,
+                    image.save(image_dir + str(name) + ".jpg", "JPEG", optimize=True,
                                progressive=True)
                 else:
-                    image.save("images/" + str(name) + ".jpg", "JPEG", quality="keep", optimize=True,
+                    image.save(image_dir + str(name) + ".jpg", "JPEG", quality="keep", optimize=True,
                                progressive=True, subsampling="keep", icc_profile=image.info.get('icc_profile'))
             elif image.format == "PNG" or (
                     image.format == None and (image.mode == 'RGBA' or image.mode == 'LA')):
-                image.save("images/" + str(name) + ".png", "PNG", optimize=True,
+                image.save(image_dir + str(name) + ".png", "PNG", optimize=True,
                            icc_profile=image.info.get('icc_profile'))
             elif image.format == "GIF" or (image.format == None and image.mode == 'P'):
-                image.save("images/" + str(name) + ".gif", "GIF", save_all=True, include_color_table=True,
+                image.save(image_dir + str(name) + ".gif", "GIF", save_all=True, include_color_table=True,
                            optimze=True)
             else:
                 image.convert("RGBA")
-                image.save("images/" + str(name) + ".png", "PNG", optimize=True,
+                image.save(image_dir + str(name) + ".png", "PNG", optimize=True,
                            icc_profile=image.info.get('icc_profile'))
             width, height = image.size
             return name, 0,None, width, height, image.mode, dhash, phash, whash
@@ -75,19 +75,24 @@ def worker(input):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Test")
     parser.add_argument("job_id", help="json which to take the links from", type=str)
-    parser.add_argument("link_list_json", help="json which to take the links from", type=str)
+    parser.add_argument("data", help="json which to take the links from", type=str)
+    parser.add_argument("image_dir", help="", type=str)
+    parser.add_argument("results-file", help="", type=str)
     args = parser.parse_args()
-    link_list = json.loads(args.link_list_json)
+    link_list = json.loads(args.data)
     m = Manager()
     lock = m.Lock()
     amount_threads = 10
+    a = open(args.image_dir + args.job_id + ".json", "r")
+    a.close()
     if len(link_list)<amount_threads:
         pool=ThreadPool(amount_threads)
     else:
         pool=ThreadPool(len(link_list))
     for i in range(len(link_list)):
         link_list[i].append(lock)
+        link_list[i].append(args.image_dir)
     result_list=pool.map(worker,link_list)
-    a = open(args.job_id + ".json", "w")
+    a = open(args.image_dir + args.job_id + ".json", "w")
     json.dump(result_list,a)
     a.close()
