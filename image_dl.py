@@ -78,11 +78,12 @@ if __name__ == "__main__":
     parser.add_argument("data", help="json which to take the links from", type=str)
     parser.add_argument("dir", help="", type=str)
     args = parser.parse_args()
+    print(args.data)
     link_list = json.loads(args.data)
     m = Manager()
     lock = m.Lock()
     amount_threads = 10
-    a = open(args.image_dir + args.job_id + ".json", "r")
+    a = open(args.dir + args.job_id + ".json", "r")
     a.close()
     if len(link_list)<amount_threads:
         pool=ThreadPool(amount_threads)
@@ -92,6 +93,6 @@ if __name__ == "__main__":
         link_list[i].append(lock)
         link_list[i].append(args.image_dir)
     result_list=pool.map(worker,link_list)
-    a = open(args.image_dir + args.job_id + ".json", "w")
+    a = open(args.dir + args.job_id + ".json", "w")
     json.dump(result_list,a)
     a.close()
