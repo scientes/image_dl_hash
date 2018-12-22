@@ -3,9 +3,9 @@
 set -e
 JOB_ID=$1
 JSON=$2
-IMAGE_DIR=$3
-RESULTS_FILE=$4
+WORK_DIR=$3
 
 
+python image_dl.py $JOB_ID $JSON $WORK_DIR
 
-python image_dl.py $JOB_ID $JSON $IMAGE_DIR $RESULTS_FILE
+
