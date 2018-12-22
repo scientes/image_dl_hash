@@ -6,4 +6,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 ENV PYTHONPATH='/src/:$PYTHONPATH'
 
 COPY entrypoint.sh /
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["sh", "/entrypoint.sh"]
