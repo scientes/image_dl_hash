@@ -1,0 +1,9 @@
+FROM python:3
+FROM scientes/pillow_imagehash:latest-general
+ADD image_dl.py /
+RUN pip install requests
+
+ENV PYTHONPATH='/src/:$PYTHONPATH'
+
+COPY entrypoint.sh /
+ENTRYPOINT ["sh", "/entrypoint.sh"]
